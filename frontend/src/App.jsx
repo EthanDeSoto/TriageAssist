@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from "react";
-import AccessGate from "./components/AccessGate";
 import Header from "./components/Header";
 import InputPanel from "./components/InputPanel";
 import ResultPanel from "./components/ResultPanel";
@@ -24,9 +23,6 @@ function successMood(priority) {
 }
 
 export default function App() {
-  const [accessCode, setAccessCode] = useState("");
-  const [gateMessage, setGateMessage] = useState(null);
-
   const [description, setDescription] = useState("");
   const [file, setFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
@@ -155,7 +151,6 @@ export default function App() {
       const response = await triageTicket({
         description: description.trim(),
         file,
-        accessCode,
         onColdStart: () => setIsColdStart(true),
       });
       const withCause = { ...response.result, likely_cause: response.result.likely_cause || "" };
@@ -163,12 +158,6 @@ export default function App() {
       setTicket(withCause);
       setStatus("success");
     } catch (requestError) {
-      if (requestError.kind === "unauthorized") {
-        setAccessCode("");
-        setGateMessage(requestError.message);
-        setStatus("idle");
-        return;
-      }
       setError({ kind: requestError.kind, message: requestError.message });
       setStatus("error");
     } finally {
@@ -227,18 +216,6 @@ export default function App() {
       return "bored";
     }
     return "idle";
-  }
-
-  if (!accessCode) {
-    return (
-      <AccessGate
-        message={gateMessage}
-        onSubmit={(code) => {
-          setGateMessage(null);
-          setAccessCode(code);
-        }}
-      />
-    );
   }
 
   return (

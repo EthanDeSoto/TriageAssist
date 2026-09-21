@@ -6,7 +6,6 @@ structured triage ticket that a technician can correct before it goes out.
 **AI suggests. You decide.**
 
 > **Live demo:** _add your Netlify URL here after deploying_
-> The demo sits behind an access code, since every request costs real API credits.
 
 <!-- Add a screenshot or GIF here -->
 
@@ -40,7 +39,7 @@ editable, because the model is a first draft, not the decision.
 
 ```mermaid
 flowchart LR
-    A[React + Vite<br/>Netlify] -->|POST /api/triage<br/>form data + X-Access-Code| B[FastAPI<br/>Render]
+    A[React + Vite<br/>Netlify] -->|POST /api/triage<br/>form data| B[FastAPI<br/>Render]
     B -->|text + image/PDF block<br/>structured output| C[Claude Haiku 4.5]
     C -->|validated TriageResult| B
     B -->|JSON ticket| A
@@ -56,13 +55,12 @@ backend/
   triage.py     the Claude call and the system prompt
   models.py     Pydantic schemas - the contract for the model's output
   uploads.py    file type, size, and PDF page validation
-  access.py     the demo access code check
   ratelimit.py  per-IP request limiting
   render.yaml   Render service definition
 frontend/
   netlify.toml  Netlify build settings
   src/
-    App.jsx       state, the access gate, and the submit flow
+    App.jsx       state and the submit flow
     api.js        the one fetch call, with timeout and error mapping
     components/   InputPanel, ResultPanel, TicketCard, FileDropZone, Stubby
 notes.md        running log of prompt changes and why
@@ -87,13 +85,11 @@ uvicorn main:app --reload
 
 ```
 ANTHROPIC_API_KEY=sk-ant-...
-DEMO_ACCESS_CODE=any-phrase-you-like
 FRONTEND_URL=http://localhost:5173
 ```
 
-The server refuses to start if either of the first two is missing. That is on
-purpose — a misconfigured deploy should fail loudly at boot, not quietly serve
-an unprotected endpoint.
+The server refuses to start if `ANTHROPIC_API_KEY` is missing. That is on
+purpose — a missing key should fail loudly at boot, not on the first request.
 
 Check it at http://127.0.0.1:8000/api/health, and try requests by hand at
 http://127.0.0.1:8000/docs.
@@ -107,12 +103,12 @@ cp .env.example .env           # VITE_API_URL=http://127.0.0.1:8000
 npm run dev
 ```
 
-Open http://localhost:5173 and enter the same `DEMO_ACCESS_CODE` you set above.
+Open http://localhost:5173.
 
 ## Deploying
 
 **Backend — Render.** `backend/render.yaml` defines the service. Set
-`ANTHROPIC_API_KEY`, `DEMO_ACCESS_CODE`, and `FRONTEND_URL` (your Netlify URL,
+`ANTHROPIC_API_KEY` and `FRONTEND_URL` (your Netlify URL,
 no trailing slash) in the dashboard.
 
 **Frontend — Netlify.** Base directory `frontend`, which picks up
@@ -124,14 +120,13 @@ no trailing slash) in the dashboard.
 | Endpoint | What it does |
 |---|---|
 | `GET /api/health` | Returns `{"status": "ok"}`. Open, so Render's health check can reach it. |
-| `POST /api/triage` | Multipart form: `text` and `file`, both optional but at least one required. Header `X-Access-Code` required. |
+| `POST /api/triage` | Multipart form: `text` and `file`, both optional but at least one required. |
 
 Errors come back in one shape — `{"error": "...", "message": "..."}` — so the
 front end can show the server's own wording instead of inventing its own:
 
 | Status | When |
 |---|---|
-| 401 | Missing or wrong access code |
 | 413 | Upload over 5 MB |
 | 415 | Not a PNG, JPEG, WEBP, or PDF, or an unreadable PDF |
 | 422 | Nothing submitted, text too short or too long, PDF over 10 pages |
@@ -163,13 +158,6 @@ found inside the ticket or a screenshot — user text arrives wrapped in `<ticke
 tags and is explicitly labeled as data, not commands. Every change to it is
 logged in `notes.md` with the ticket that caused it.
 
-**An access code, not real auth.** Accounts, sessions, and password resets would
-be days of work protecting a demo that holds no user data. One shared code
-checked against an env var, compared with `secrets.compare_digest`, does the one
-job that matters: a public URL wired to a paid API shouldn't be an open wallet.
-The code lives in React state, never in the bundle and never in localStorage, so
-it isn't left sitting on disk after the tab closes.
-
 **Validation on the server, even though the browser checks too.** The front end
 checks file type and size so users get an instant answer. The server checks
 again, and it checks the file's magic bytes rather than trusting the filename or
@@ -187,7 +175,6 @@ are allowed to be pleasant.
 
 ## Cost and abuse controls
 
-- An access code on the only endpoint that spends money
 - 10 requests per minute per IP, in memory
 - 5 MB upload cap, enforced by a middleware that reads `Content-Length` before
   the body is ever buffered, and again after the file is read
@@ -204,8 +191,8 @@ are allowed to be pleasant.
   measured accuracy score, and the UI says so on hover.
 - **The rate limiter is per process and in memory.** It resets on restart and
   wouldn't hold across multiple instances. Real traffic wants Redis.
-- **One shared access code.** No per-user access, and no revoking it short of
-  changing the env var and redeploying.
+- **No access control.** It runs locally, so anyone who can reach the server
+  can spend API credits through it. Deploying it publicly would need a gate first.
 - **Free-tier cold starts.** The first request after an idle period can take up
   to a minute. The UI watches for this and says so instead of just spinning.
 - **No accuracy numbers yet.** The prompt has been tuned by hand against fake

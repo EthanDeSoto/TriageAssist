@@ -27,3 +27,9 @@ soon", which is a button that lies. Editing plus Copy as text / Copy JSON stays.
 Save comes back when the database phase lands.
 
 Deleted the empty db.py and dropped the unused triageId state in App.jsx.
+
+## Local only (2026-09-21)
+
+Not hosting for now. Removed the access code (backend/access.py, AccessGate,
+X-Access-Code header, DEMO_ACCESS_CODE). Kept the rate limit, upload caps, and
+deploy configs. If this goes public again, it needs a gate back first.

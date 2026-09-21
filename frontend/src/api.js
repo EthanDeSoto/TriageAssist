@@ -20,7 +20,6 @@ function buildRequestBody(description, file) {
 
 const FALLBACK_MESSAGES = {
   validation: "The server could not accept this request. Check the description and try again.",
-  unauthorized: "That access code is not right. Enter it again.",
   rate_limited: "That is a lot of tickets at once. Wait a minute and try again.",
   ai: "The AI couldn't triage this one. Try rewording or try again.",
   unknown: "Something went wrong on the server. Try again in a moment.",
@@ -41,7 +40,7 @@ async function readJsonBody(response) {
   }
 }
 
-export async function triageTicket({ description, file, accessCode, onColdStart }) {
+export async function triageTicket({ description, file, onColdStart }) {
   const controller = new AbortController();
   let timedOut = false;
 
@@ -61,7 +60,6 @@ export async function triageTicket({ description, file, accessCode, onColdStart 
     response = await fetch(`${API_URL}/api/triage`, {
       method: "POST",
       body: buildRequestBody(description, file),
-      headers: { "X-Access-Code": accessCode },
       signal: controller.signal,
     });
   } catch (error) {
@@ -95,10 +93,6 @@ export async function triageTicket({ description, file, accessCode, onColdStart 
 
   if (response.status === 422 || response.status === 413 || response.status === 415) {
     throw new TriageRequestError("validation", readServerMessage(payload, "validation"));
-  }
-
-  if (response.status === 401) {
-    throw new TriageRequestError("unauthorized", readServerMessage(payload, "unauthorized"));
   }
 
   if (response.status === 429) {
