@@ -1,0 +1,100 @@
+.file-drop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  padding: 18px 14px;
+  border: 1.5px dashed var(--border-strong);
+  border-radius: var(--radius);
+  background: var(--surface-sunken);
+  color: var(--text-muted);
+  text-align: center;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.file-drop:hover,
+.file-drop-active {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.file-drop-main {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.file-drop-hint {
+  font-size: 12px;
+  color: var(--text-faint);
+}
+
+.file-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-sunken);
+}
+
+.file-thumbnail {
+  width: 44px;
+  height: 44px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.file-icon {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 6px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.file-meta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.file-name {
+  font-size: 14px;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-size {
+  font-size: 12px;
+  color: var(--text-faint);
+}
+
+.file-remove {
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--text-muted);
+  border-radius: 6px;
+  width: 28px;
+  height: 28px;
+  font-size: 18px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.file-remove:hover {
+  color: var(--danger);
+  border-color: var(--danger);
+}

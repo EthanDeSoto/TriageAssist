@@ -1,0 +1,59 @@
+.gate {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+}
+
+.gate-card {
+  width: 100%;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: 28px;
+}
+
+.gate-title {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.gate-lead {
+  margin: 6px 0 20px;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.gate-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.gate-input {
+  background: var(--surface-sunken);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  margin-bottom: 16px;
+}
+
+.gate-input:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.gate-error {
+  margin: 0 0 16px;
+  color: var(--danger);
+  background: var(--danger-bg);
+  border-radius: var(--radius);
+  padding: 8px 10px;
+  font-size: 13px;
+}
