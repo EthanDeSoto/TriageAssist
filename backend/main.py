@@ -10,7 +10,6 @@ from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.formparsers import MultiPartParser
 
-from access import enforce_access_code
 from errors import ApiError
 from models import TriageResponse
 from ratelimit import enforce_rate_limit
@@ -33,11 +32,6 @@ async def lifespan(app):
         raise RuntimeError(
             "ANTHROPIC_API_KEY is not set. Copy backend/.env.example to backend/.env "
             "and add your key, or set it in the Render dashboard."
-        )
-    if not os.getenv("DEMO_ACCESS_CODE"):
-        raise RuntimeError(
-            "DEMO_ACCESS_CODE is not set. Pick any phrase and put it in backend/.env "
-            "or in the Render dashboard. Without it the endpoint is open to anyone."
         )
     yield
 
@@ -125,7 +119,6 @@ async def triage(
     file: UploadFile | None = File(None),
 ):
     enforce_rate_limit(request)
-    enforce_access_code(request)
 
     description = (text or "").strip()
     file_bytes = await file.read() if file is not None and file.filename else None

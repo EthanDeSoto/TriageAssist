@@ -5,10 +5,7 @@ structured triage ticket that a technician can correct before it goes out.
 
 **AI suggests. You decide.**
 
-> **Live demo:** _add your Netlify URL here after deploying_
-> The demo sits behind an access code, since every request costs real API credits.
-
-<!-- Add a screenshot or GIF here -->
+<!-- Screenshot or GIF goes here -->
 
 ---
 
@@ -36,16 +33,9 @@ editable, because the model is a first draft, not the decision.
 | `next_steps` | Three to five concrete actions, quickest likely fix first |
 | `questions_for_user` | Only what's missing and would change the next steps |
 
-## Architecture
+## How it works
 
-```mermaid
-flowchart LR
-    A[React + Vite<br/>Netlify] -->|POST /api/triage<br/>form data + X-Access-Code| B[FastAPI<br/>Render]
-    B -->|text + image/PDF block<br/>structured output| C[Claude Haiku 4.5]
-    C -->|validated TriageResult| B
-    B -->|JSON ticket| A
-```
-
+it's three pieces. The front end is React, built with Vite. When you hit Submit, it sends your text and any screenshot or PDF to a FastAPI back end. The back end validates the file type and size, and then sends everything to Claude Haiku. Instead of just asking the model for JSON and hoping, I use structured outputs with a Pydantic schema, so every response comes back in the exact shape the app expects: category, priority, assigned group, next steps, and questions for the user. Then the front end turns that into the ticket card you see here."
 One request in, one ticket out. No queue, no database, no agent loop.
 
 ## Repo layout
@@ -56,13 +46,10 @@ backend/
   triage.py     the Claude call and the system prompt
   models.py     Pydantic schemas - the contract for the model's output
   uploads.py    file type, size, and PDF page validation
-  access.py     the demo access code check
   ratelimit.py  per-IP request limiting
-  render.yaml   Render service definition
 frontend/
-  netlify.toml  Netlify build settings
   src/
-    App.jsx       state, the access gate, and the submit flow
+    App.jsx       state and the submit flow
     api.js        the one fetch call, with timeout and error mapping
     components/   InputPanel, ResultPanel, TicketCard, FileDropZone, Stubby
 notes.md        running log of prompt changes and why
@@ -87,16 +74,11 @@ uvicorn main:app --reload
 
 ```
 ANTHROPIC_API_KEY=sk-ant-...
-DEMO_ACCESS_CODE=any-phrase-you-like
 FRONTEND_URL=http://localhost:5173
 ```
 
-The server refuses to start if either of the first two is missing. That is on
-purpose — a misconfigured deploy should fail loudly at boot, not quietly serve
-an unprotected endpoint.
-
-Check it at http://127.0.0.1:8000/api/health, and try requests by hand at
-http://127.0.0.1:8000/docs.
+The server refuses to start if `ANTHROPIC_API_KEY` is missing, so a missing key
+fails at startup instead of on the first request.
 
 **Frontend**
 
@@ -107,31 +89,19 @@ cp .env.example .env           # VITE_API_URL=http://127.0.0.1:8000
 npm run dev
 ```
 
-Open http://localhost:5173 and enter the same `DEMO_ACCESS_CODE` you set above.
-
-## Deploying
-
-**Backend — Render.** `backend/render.yaml` defines the service. Set
-`ANTHROPIC_API_KEY`, `DEMO_ACCESS_CODE`, and `FRONTEND_URL` (your Netlify URL,
-no trailing slash) in the dashboard.
-
-**Frontend — Netlify.** Base directory `frontend`, which picks up
-`frontend/netlify.toml`. Set `VITE_API_URL` to the Render URL. Vite bakes
-`VITE_` variables in at build time, so changing one means triggering a redeploy.
+Open http://localhost:5173.
 
 ## The API
 
 | Endpoint | What it does |
 |---|---|
-| `GET /api/health` | Returns `{"status": "ok"}`. Open, so Render's health check can reach it. |
-| `POST /api/triage` | Multipart form: `text` and `file`, both optional but at least one required. Header `X-Access-Code` required. |
+| `GET /api/health` | Returns `{"status": "ok"}` |
+| `POST /api/triage` | Multipart form: `text` and `file`, both optional but at least one required |
 
-Errors come back in one shape — `{"error": "...", "message": "..."}` — so the
-front end can show the server's own wording instead of inventing its own:
+Errors all come back as `{"error": "...", "message": "..."}`:
 
 | Status | When |
 |---|---|
-| 401 | Missing or wrong access code |
 | 413 | Upload over 5 MB |
 | 415 | Not a PNG, JPEG, WEBP, or PDF, or an unreadable PDF |
 | 422 | Nothing submitted, text too short or too long, PDF over 10 pages |
@@ -142,91 +112,50 @@ front end can show the server's own wording instead of inventing its own:
 
 **Structured outputs, not "please return JSON."** `models.py` defines the ticket
 as a Pydantic model and `client.messages.parse()` hands that schema to the API,
-so `category` can only ever be one of six values. Asking for JSON in the prompt
-and parsing the reply means writing a parser, a retry, and a repair path for
-markdown fences and trailing prose. The schema removes that whole class of bug.
-When the model refuses or hits the token cap, `stop_reason` says so and the
-request fails cleanly as a 502 rather than returning half a ticket.
+so `category` can only ever be one of six values. No hand-written JSON parsing
+or repair.
 
-**Haiku 4.5, not a bigger model.** Triage is classification against a written
-rubric plus a short list of steps. That is a small model's job. Haiku answers in
-about a second for a fraction of a cent, which matters for a demo anyone can
-open. If accuracy on the harder judgment calls turned out to be the limit, the
-fix is a model swap on one line in `triage.py` — worth measuring before
-spending, which is what the evaluation phase is for.
+**Haiku 4.5.** Triage is classification against a written rubric plus a short
+list of steps. A small model handles that quickly and cheaply. Swapping models
+is one line in `triage.py`.
 
-**Almost all the logic lives in the prompt.** The system prompt is long and
-specific on purpose: it defines each category, each priority tier, and each
-group in the words a service desk would actually use, because "high priority"
-means nothing without a rule. It also tells the model to ignore instructions
-found inside the ticket or a screenshot — user text arrives wrapped in `<ticket>`
-tags and is explicitly labeled as data, not commands. Every change to it is
-logged in `notes.md` with the ticket that caused it.
+**Most of the logic lives in the prompt.** The system prompt defines each
+category, priority, and group in plain service-desk terms. User text is wrapped
+in `<ticket>` tags and treated as data, so instructions inside a ticket or
+screenshot are ignored. Prompt changes are logged in `notes.md`.
 
-**An access code, not real auth.** Accounts, sessions, and password resets would
-be days of work protecting a demo that holds no user data. One shared code
-checked against an env var, compared with `secrets.compare_digest`, does the one
-job that matters: a public URL wired to a paid API shouldn't be an open wallet.
-The code lives in React state, never in the bundle and never in localStorage, so
-it isn't left sitting on disk after the tab closes.
+**The server validates too.** The browser checks file type and size for quick
+feedback, but the server checks again using the file's actual bytes, not the
+filename.
 
-**Validation on the server, even though the browser checks too.** The front end
-checks file type and size so users get an instant answer. The server checks
-again, and it checks the file's magic bytes rather than trusting the filename or
-the `Content-Type` header, because anyone can post straight to the endpoint with
-curl. The browser check is a convenience; the server check is the rule.
+**Stubby.** A draggable cartoon technician who reacts to what the app is doing.
+He can be switched off in the header.
 
-**No agent loop.** One request, one model call, one response. There is nothing
-here for a model to decide about tool order or retries, and an agent layer would
-add latency, cost, and failure modes in exchange for nothing.
+## Limits
 
-**A mascot.** Stubby is a draggable cartoon technician who reacts to what the
-app is doing and reads a newspaper when the queue is quiet. He can be switched
-off in the header. He does nothing functional, and that is fine — internal tools
-are allowed to be pleasant.
-
-## Cost and abuse controls
-
-- An access code on the only endpoint that spends money
-- 10 requests per minute per IP, in memory
-- 5 MB upload cap, enforced by a middleware that reads `Content-Length` before
-  the body is ever buffered, and again after the file is read
-- 10-page cap on PDFs, since pages are tokens
-- 5,000-character cap on pasted text
-- A hard monthly spend limit set in the Anthropic Console, which is the backstop
-  for everything the code fails to catch
+- 10 requests per minute per IP
+- 5 MB upload cap
+- 10 pages per PDF
+- 5,000 characters of pasted text
 
 ## Known limitations
 
-- **Corrections don't persist.** You can edit every field and copy the result
-  out, but nothing is saved. The database phase is next.
-- **`confidence` is self-reported.** It is the model's own estimate, not a
-  measured accuracy score, and the UI says so on hover.
-- **The rate limiter is per process and in memory.** It resets on restart and
-  wouldn't hold across multiple instances. Real traffic wants Redis.
-- **One shared access code.** No per-user access, and no revoking it short of
-  changing the env var and redeploying.
-- **Free-tier cold starts.** The first request after an idle period can take up
-  to a minute. The UI watches for this and says so instead of just spinning.
+- **Corrections don't save.** You can edit every field and copy the result, but
+  nothing is stored.
+- **`confidence` is self-reported** by the model, not a measured score.
+- **The rate limiter is in memory** and resets when the server restarts.
+- **No login.** Anyone who can reach the server can use your API key.
 - **No accuracy numbers yet.** The prompt has been tuned by hand against fake
-  tickets. Nothing has been measured.
+  tickets.
 
 ## What's next
 
-1. **SQLite for history and corrections** — store the AI's answer and the saved
-   answer side by side, so "techs changed the AI's answer on X of Y tickets"
-   becomes a number instead of a feeling. That number is the whole point of an
-   AI-suggests-human-decides tool.
-2. **An evaluation set** — 20 to 25 labeled fake tickets, accuracy per field, and
-   a before-and-after on one prompt change.
-3. **Corrections fed back into the prompt** — the disagreements are the signal
-   for the next revision of the rubric.
-4. **Postgres over SQLite** if this ever outlived a demo, since free hosting
-   wipes local files on restart.
+1. SQLite for ticket history and corrections, to track how often techs change
+   the AI's answer.
+2. An evaluation set of labeled fake tickets to measure accuracy per field.
 
 ## About the data
 
-Every ticket in this repo is invented. Nothing comes from a real company, a real
-ticketing system, or a real person. The sample tickets in
-`frontend/src/sampleTickets.js` are written to resemble the kinds of requests a
-service desk actually sees, which is not the same as being real ones.
+Every ticket in this repo is invented. The sample tickets in
+`frontend/src/sampleTickets.js` resemble real service desk requests but are not
+real ones.

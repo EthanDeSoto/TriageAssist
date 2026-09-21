@@ -12,7 +12,5 @@ services:
         value: 3.12.7
       - key: ANTHROPIC_API_KEY
         sync: false
-      - key: DEMO_ACCESS_CODE
-        sync: false
       - key: FRONTEND_URL
         sync: false
