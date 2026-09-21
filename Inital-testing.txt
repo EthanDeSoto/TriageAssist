@@ -1,0 +1,108 @@
+Ticket 1:hey so my computer keeps asking me for my password over and over. i type it in and it just asks again. happens every time i open outlook or teams, been going on since monday.
+ i did change my password last week if that matters. i can still get on the internet and stuff, just those two. kind of urgent bc i have a client call at 2
+ Response: {
+  "summary": "Outlook and Teams repeatedly prompt for password entry",
+  "category": "software",
+  "priority": "high",
+  "assigned_group": "service_desk",
+  "confidence": "medium",
+  "next_steps": [
+    "Check if Outlook and Teams are fully updated or if an update is pending",
+    "Verify that the cached credentials for Outlook and Teams are cleared and re-entered",
+    "If the issue persists, collect application event logs showing the authentication failures for further investigation",
+    "Contact the identity and access team if this appears to be an account or credential validation issue"
+  ],
+  "questions_for_user": [
+    "Are you able to log in to Outlook or Teams on a web browser (outlook.com or teams.microsoft.com), and do they work without prompting repeatedly?",
+    "When you changed your password last week, did Outlook and Teams work normally after that, or did the repeated prompts start immediately?",
+    "Are you receiving any error messages, or does it just keep prompting for the password silently?"
+  ]
+}
+
+Ticket2: My second monitor went black this morning. The little light on the front is blinking orange instead of white. I tried unplugging it and plugging it back in and nothing.
+ The other monitor works fine. Its the Dell one on the left side of my desk. I'm at the Denver office, 2nd floor by the window.
+ Response: {
+  "summary": "Second monitor displaying black screen, power light blinking orange",
+  "category": "hardware",
+  "priority": "medium",
+  "assigned_group": "desktop_support",
+  "confidence": "high",
+  "next_steps": [
+    "Verify the video cable connection between the monitor and computer is fully seated",
+    "Check if the monitor's power cable is fully plugged into both the monitor and wall outlet",
+    "Try connecting the monitor to the same video port as the working monitor to isolate whether it's a display output problem",
+    "If the monitor still shows no picture, swap the working monitor's cable to the non-working monitor to rule out a faulty cable",
+    "If the monitor remains unresponsive, it likely needs hardware replacement"
+  ],
+  "questions_for_user": [
+    "What video cable connection type does the Dell monitor use (DisplayPort, HDMI, USB-C, or VGA)?"
+  ]
+}
+
+Ticket3: vpn keeps disconnecting when im working from home. Every 10-15 min it drops and i have to reconnect, then i lose whatever i had open on the shared drive. Its been about a week.
+ Home internet seems fine, netflix doesnt buffer or anything. Using the company laptop, not my personal one. Really annoying and I lost a spreadsheet yesterday
+ Response: {
+  "summary": "VPN disconnects every 10-15 minutes while working from home",
+  "category": "network",
+  "priority": "high",
+  "assigned_group": "network",
+  "confidence": "high",
+  "next_steps": [
+    "Check VPN client logs on the laptop for disconnection errors or timeout patterns",
+    "Verify VPN client version and confirm all security updates are installed",
+    "Test VPN stability by monitoring connection for 30 minutes while idle to isolate user activity triggers",
+    "If persistent, check for firewall or router issues on the home network side",
+    "Consider temporary alternate access method like VPN from a different network location to confirm client vs. home network cause"
+  ],
+  "questions_for_user": [
+    "What is the exact VPN client software and version you are using?",
+    "Does the disconnection happen at random times or during specific activities like large file transfers?",
+    "Have you changed your home network setup, router, or internet provider in the past week?"
+  ]
+}
+
+Ticket4: Hi, we have a new person starting Monday, Sarah Mitchell, joining the accounting team under Dave Robinson.
+ She'll need a laptop, email, access to the accounting shared drive and the finance app, and a desk phone. Sorry for the short notice, HR just told me today.
+  Let me know if you need anything else from me.
+  Response: {
+  "summary": "New hire Sarah Mitchell onboarding Monday needs laptop and access",
+  "category": "access",
+  "priority": "high",
+  "assigned_group": "identity_access",
+  "confidence": "high",
+  "next_steps": [
+    "Create user account for Sarah Mitchell in Active Directory with appropriate groups",
+    "Provision email account and configure on a laptop",
+    "Grant access to accounting shared drive and finance app",
+    "Arrange desk phone setup and assignment to desk location",
+    "Confirm all systems are ready and provide welcome package before Monday start"
+  ],
+  "questions_for_user": [
+    "What is Sarah's manager's email or employee ID (for Dave Robinson)?",
+    "Do you have a laptop ready to assign, or does one need to be ordered or imaged?",
+    "What is the desk phone number or location where Sarah will sit?"
+  ]
+}
+
+Ticket5: I got a weird email from "IT Support" saying my mailbox is almost full and I need to click a link to verify my account within 24 hours or it will be deleted.
+ The sender address looked like it had a bunch of random letters in it.
+  I did NOT click the link but a coworker said she got the same one and she thinks she clicked it before she noticed. Should I be worried? Forwarding it to you now.
+Response: {
+  "summary": "Suspected phishing email targeting mailbox storage with account verification link",
+  "category": "security",
+  "priority": "critical",
+  "assigned_group": "security",
+  "confidence": "high",
+  "next_steps": [
+    "Immediately reset the password for the coworker who clicked the link and check for unauthorized access or forwarding rules",
+    "Verify whether the coworker's account has been accessed by reviewing login history and sent items",
+    "Scan both users' devices for malware using endpoint protection tools",
+    "Send a company-wide alert warning users not to click links from the suspicious sender address",
+    "Review email gateway logs to determine how many other users received this phishing email"
+  ],
+  "questions_for_user": [
+    "Can you provide the exact sender email address from the suspicious message?",
+    "Do you know if your coworker entered her password or other credentials after clicking the link?",
+    "Did either of you download any attachments from these emails?"
+  ]
+}
