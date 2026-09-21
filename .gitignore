@@ -4,3 +4,6 @@ __pycache__/
 node_modules/
 dist/
 *.db
+TriageAssistRoadmap.md
+HOW-IT-WORKS.txt
+Triage Assist Notes.txt

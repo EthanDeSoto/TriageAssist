@@ -1,4 +1,7 @@
-fastapi #web framework
-uvicorn #server that the webframework runs on
-python-dotenv #allows python to read my .env file
-python-multipart #allows python to read input files
+anthropic==1.5.0
+fastapi==0.141.1
+pydantic==2.13.5
+pypdf==6.19.0
+python-dotenv==1.2.3
+python-multipart==0.0.32
+uvicorn[standard]==0.52.4
