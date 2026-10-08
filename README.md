@@ -35,7 +35,13 @@ editable, because the model is a first draft, not the decision.
 
 ## How it works
 
-it's three pieces. The front end is React, built with Vite. When you hit Submit, it sends your text and any screenshot or PDF to a FastAPI back end. The back end validates the file type and size, and then sends everything to Claude Haiku. Instead of just asking the model for JSON and hoping, I use structured outputs with a Pydantic schema, so every response comes back in the exact shape the app expects: category, priority, assigned group, next steps, and questions for the user. Then the front end turns that into the ticket card you see here."
+There are three pieces. The front end is React, built with Vite. When you hit
+Submit, it sends your text and any screenshot or PDF to a FastAPI back end. The
+back end validates the file type and size, then sends everything to Claude Haiku.
+Instead of asking the model for JSON and hoping, it uses structured outputs with
+a Pydantic schema, so every response comes back in the exact shape the app
+expects. The front end turns that into the editable ticket card.
+
 One request in, one ticket out. No queue, no database, no agent loop.
 
 ## Repo layout
@@ -47,6 +53,7 @@ backend/
   models.py     Pydantic schemas - the contract for the model's output
   uploads.py    file type, size, and PDF page validation
   ratelimit.py  per-IP request limiting
+  errors.py     the ApiError exception used for every error response
 frontend/
   src/
     App.jsx       state and the submit flow
@@ -144,7 +151,8 @@ He can be switched off in the header.
   nothing is stored.
 - **`confidence` is self-reported** by the model, not a measured score.
 - **The rate limiter is in memory** and resets when the server restarts.
-- **No login.** Anyone who can reach the server can use your API key.
+- **No login, so it is local only.** Anyone who can reach the server can use
+  your API key. Put an access gate in front of it before hosting it anywhere.
 - **No accuracy numbers yet.** The prompt has been tuned by hand against fake
   tickets.
 
