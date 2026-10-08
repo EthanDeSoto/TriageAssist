@@ -23,7 +23,7 @@ class TriageResult(BaseModel):
         description="One sentence naming the most probable cause, written as a theory rather than a diagnosis."
     )
     next_steps: list[str] = Field(
-        description="Three to five concrete actions for the technician, in the order they should be done."
+        description="At most five concrete actions for the technician, in the order they should be done. Never more than five."
     )
     questions_for_user: list[str] = Field(
         description="Only missing information that would change the next steps. Empty list if nothing is missing."

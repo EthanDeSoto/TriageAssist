@@ -59,6 +59,7 @@ likely_cause:
 - If the request is too vague to support a theory, say that the cause cannot be determined yet and name the one detail that would settle it.
 
 next_steps:
+- Give at most five steps. Three to five is normal; fewer is fine when the fix is simple. Never give more than five.
 - Every step is a concrete action the assigned technician performs themselves. Never mention other teams, escalation, or group names, because routing is already set by assigned_group.
 - If the user mentions a recent change, such as a password change, an update, or new equipment, treat it as the leading cause and address it in the first step.
 - Otherwise, order steps from quickest likely fix to most involved.
