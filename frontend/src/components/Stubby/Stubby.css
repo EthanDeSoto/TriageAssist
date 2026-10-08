@@ -1,0 +1,573 @@
+.stubby {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 40;
+  width: 116px;
+  touch-action: none;
+  cursor: grab;
+  user-select: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.stubby-dragging {
+  cursor: grabbing;
+}
+
+.stubby-stage {
+  position: relative;
+  width: 116px;
+  height: 116px;
+}
+
+.stubby-svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  transform-origin: 50% 90%;
+}
+
+.stubby-body {
+  fill: var(--surface);
+  stroke: var(--text);
+  stroke-width: 2.4;
+  stroke-linejoin: round;
+}
+
+.stubby-perforation {
+  stroke: var(--border-strong);
+  stroke-width: 1.6;
+  stroke-dasharray: 3 4;
+  stroke-linecap: round;
+  fill: none;
+}
+
+.stubby-print {
+  fill: var(--border-strong);
+}
+
+.stubby-ink {
+  stroke: var(--text);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+}
+
+.stubby-eye {
+  fill: var(--text);
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: stubby-blink 5.5s infinite;
+}
+
+.stubby-hand {
+  fill: var(--text);
+}
+
+.stubby-arm {
+  transform-box: fill-box;
+}
+
+.stubby-arm-left {
+  transform-origin: 100% 0;
+}
+
+.stubby-arm-right {
+  transform-origin: 0 0;
+}
+
+.stubby-sleeve {
+  fill: var(--accent);
+  stroke: none;
+}
+
+.stubby-thumb rect {
+  fill: var(--surface);
+  stroke: var(--text);
+  stroke-width: 2.2;
+}
+
+.stubby-coffee path:first-child {
+  fill: var(--accent-soft);
+  stroke: var(--text);
+  stroke-width: 2.2;
+}
+
+.stubby-steam {
+  opacity: 0.55;
+  stroke-width: 1.8;
+  animation: stubby-fade-pulse 2.4s ease-in-out infinite;
+}
+
+.stubby-extinguisher rect {
+  fill: var(--critical);
+  stroke: var(--text);
+  stroke-width: 2.2;
+}
+
+.stubby-sweat path {
+  fill: var(--medium);
+  animation: stubby-sweat-drip 1.6s ease-in infinite;
+}
+
+.stubby-sweat path:last-child {
+  animation-delay: 0.6s;
+}
+
+.stubby-zzz text {
+  fill: var(--text-muted);
+  font-size: 11px;
+  font-weight: 700;
+  animation: stubby-float 2.6s ease-in-out infinite;
+}
+
+.stubby-zzz text:nth-child(2) {
+  animation-delay: 0.5s;
+}
+
+.stubby-zzz text:nth-child(3) {
+  animation-delay: 1s;
+}
+
+.stubby-newspaper > rect {
+  fill: var(--surface);
+  stroke: var(--text);
+  stroke-width: 2.2;
+}
+
+.stubby-newspaper text {
+  fill: var(--text);
+  font-size: 6.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.stubby-newsprint rect {
+  fill: var(--border-strong);
+}
+
+.stubby-bubble {
+  max-width: 210px;
+  background: var(--text);
+  color: var(--page);
+  font-size: 12.5px;
+  line-height: 1.4;
+  padding: 8px 11px;
+  border-radius: 12px;
+  box-shadow: var(--shadow-lg);
+  pointer-events: none;
+  animation: stubby-bubble-in 0.18s ease-out;
+}
+
+.confetti {
+  position: absolute;
+  left: 50%;
+  top: 34%;
+  width: 6px;
+  height: 6px;
+  border-radius: 1px;
+  background: var(--accent);
+  animation: stubby-confetti 900ms ease-out var(--delay) forwards;
+  opacity: 0;
+}
+
+.confetti:nth-child(3n) {
+  background: var(--medium);
+}
+
+.confetti:nth-child(3n + 1) {
+  background: var(--high);
+}
+
+.stubby[data-mood="idle"] .stubby-svg {
+  animation: stubby-bob 3.4s ease-in-out infinite;
+}
+
+.stubby[data-mood="bored"] .stubby-svg {
+  animation: stubby-yawn 1.8s ease-in-out;
+}
+
+.stubby[data-mood="typing"] .stubby-svg {
+  animation: stubby-lean 0.5s ease-out forwards;
+}
+
+.stubby[data-mood="caught"] .stubby-svg {
+  animation: stubby-catch 0.6s cubic-bezier(0.3, 1.5, 0.5, 1);
+}
+
+.stubby[data-mood="caught"] .stubby-arm-left {
+  animation: stubby-arm-up 0.6s ease-out;
+}
+
+.stubby[data-mood="caught"] .stubby-arm-right {
+  animation: stubby-arm-up-mirror 0.6s ease-out;
+}
+
+.stubby[data-mood="loading"] .stubby-svg {
+  animation: stubby-pace 2.6s ease-in-out infinite;
+}
+
+.stubby[data-mood="loading"] .stubby-arm-left {
+  animation: stubby-check-watch 5s ease-in-out infinite;
+}
+
+.stubby[data-mood="coldStart"] .stubby-svg {
+  animation: stubby-lie-down 0.8s ease-in forwards,
+    stubby-snore 3.2s ease-in-out 0.8s infinite;
+}
+
+.stubby[data-mood="successLow"] .stubby-svg,
+.stubby[data-mood="successMedium"] .stubby-svg,
+.stubby[data-mood="successHigh"] .stubby-svg {
+  animation: stubby-pop 0.6s cubic-bezier(0.3, 1.5, 0.5, 1);
+}
+
+.stubby[data-mood="successMedium"] .stubby-arm-right {
+  animation: stubby-thumbs-up 0.7s ease-out;
+}
+
+.stubby[data-mood="successHigh"] .stubby-arm-left,
+.stubby[data-mood="successHigh"] .stubby-arm-right {
+  animation: stubby-flex 1.2s ease-in-out;
+}
+
+.stubby[data-mood="successCritical"] .stubby-svg {
+  animation: stubby-pop 0.6s cubic-bezier(0.3, 1.5, 0.5, 1),
+    stubby-panic 0.5s ease-in-out 0.6s 4;
+}
+
+.stubby[data-mood="error"] .stubby-svg {
+  animation: stubby-faint 3.6s ease-in-out forwards;
+}
+
+.stubby[data-mood="clicked"] .stubby-svg {
+  animation: stubby-hop 0.45s ease-out;
+}
+
+.stubby[data-mood="leaving"] .stubby-svg {
+  animation: stubby-wave-goodbye 1.4s ease-in forwards;
+}
+
+.stubby[data-mood="leaving"] .stubby-arm-right {
+  animation: stubby-wave 0.9s ease-in-out 2;
+}
+
+@keyframes stubby-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes stubby-blink {
+  0%,
+  92%,
+  100% {
+    transform: scaleY(1);
+  }
+  95% {
+    transform: scaleY(0.1);
+  }
+}
+
+@keyframes stubby-yawn {
+  0%,
+  100% {
+    transform: scale(1, 1);
+  }
+  40% {
+    transform: scale(0.97, 1.05) translateY(-3px);
+  }
+}
+
+@keyframes stubby-lean {
+  to {
+    transform: translateX(-8px) rotate(-9deg);
+  }
+}
+
+@keyframes stubby-catch {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.12, 0.9) translateY(4px);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes stubby-arm-up {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  40% {
+    transform: rotate(-55deg);
+  }
+}
+
+@keyframes stubby-arm-up-mirror {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  40% {
+    transform: rotate(55deg);
+  }
+}
+
+@keyframes stubby-pace {
+  0%,
+  100% {
+    transform: translateX(-16px) scaleX(1);
+  }
+  48% {
+    transform: translateX(16px) scaleX(1);
+  }
+  50% {
+    transform: translateX(16px) scaleX(-1);
+  }
+  98% {
+    transform: translateX(-16px) scaleX(-1);
+  }
+}
+
+@keyframes stubby-check-watch {
+  0%,
+  60%,
+  100% {
+    transform: rotate(0);
+  }
+  70%,
+  85% {
+    transform: rotate(-95deg);
+  }
+}
+
+@keyframes stubby-lie-down {
+  to {
+    transform: rotate(88deg) translateY(14px);
+  }
+}
+
+@keyframes stubby-snore {
+  0%,
+  100% {
+    transform: rotate(88deg) translateY(14px) scale(1);
+  }
+  50% {
+    transform: rotate(88deg) translateY(14px) scale(1.04);
+  }
+}
+
+@keyframes stubby-pop {
+  0% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(1.14) translateY(-8px);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes stubby-panic {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-3px);
+  }
+  75% {
+    transform: translateX(3px);
+  }
+}
+
+@keyframes stubby-thumbs-up {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  45% {
+    transform: rotate(-40deg);
+  }
+}
+
+@keyframes stubby-flex {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  50% {
+    transform: rotate(-25deg);
+  }
+}
+
+@keyframes stubby-faint {
+  0% {
+    transform: rotate(0);
+  }
+  14% {
+    transform: rotate(-8deg);
+  }
+  30%,
+  62% {
+    transform: rotate(84deg) translateY(16px);
+  }
+  80% {
+    transform: rotate(0);
+  }
+  86% {
+    transform: rotate(6deg);
+  }
+  92% {
+    transform: rotate(-6deg);
+  }
+  100% {
+    transform: rotate(0);
+  }
+}
+
+@keyframes stubby-hop {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  45% {
+    transform: translateY(-12px);
+  }
+}
+
+@keyframes stubby-wave {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  50% {
+    transform: rotate(-50deg);
+  }
+}
+
+@keyframes stubby-wave-goodbye {
+  0%,
+  55% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(160px);
+    opacity: 0;
+  }
+}
+
+@keyframes stubby-confetti {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) rotate(0);
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(var(--angle)) translateX(var(--distance)) rotate(340deg);
+  }
+}
+
+@keyframes stubby-float {
+  0%,
+  100% {
+    opacity: 0.2;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes stubby-fade-pulse {
+  0%,
+  100% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes stubby-sweat-drip {
+  0% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+
+@keyframes stubby-bubble-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 620px) {
+  .stubby {
+    right: 12px;
+    bottom: 12px;
+    width: 84px;
+  }
+
+  .stubby-stage {
+    width: 84px;
+    height: 84px;
+  }
+
+  .stubby-bubble {
+    max-width: 160px;
+    font-size: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stubby-svg,
+  .stubby-arm,
+  .stubby-eye,
+  .stubby-zzz text,
+  .stubby-sweat path,
+  .stubby-steam,
+  .confetti,
+  .stubby-bubble {
+    animation: none !important;
+  }
+
+  .stubby-svg {
+    transition: opacity 0.3s ease;
+  }
+
+  .stubby[data-mood="leaving"] .stubby-svg {
+    opacity: 0;
+  }
+
+  .confetti {
+    display: none;
+  }
+}
